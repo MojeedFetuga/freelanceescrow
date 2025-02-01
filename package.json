@@ -1,0 +1,26 @@
+{
+  "name": "escrow",
+  "version": "1.0.0",
+  "description": "Freelance Escrow Payment Solution",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "freelance",
+    "escrow",
+    "payment"
+  ],
+  "author": "web3bridge",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "ethers": "^6.13.5",
+    "hardhat": "^2.22.18",
+    "hardhat-deploy": "^0.14.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/FreelanceEscrow.sol": {
+      "content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.20;\r\n\r\ncontract FreelanceEscrow {\r\n    address public owner;\r\n\r\n    enum JobStatus { Pending, Accepted, Completed, Withdrawn }\r\n    \r\n    struct Job {\r\n        address client;\r\n        address freelancer;\r\n        uint256 amount;\r\n        JobStatus status;\r\n    }\r\n\r\n    mapping(uint256 => Job) public jobs;\r\n    uint256 public jobCounter;\r\n\r\n    modifier onlyOwner() {\r\n        require(msg.sender == owner, \"Only owner can call this function\");\r\n        _;\r\n    }\r\n\r\n    modifier onlyClient(uint256 jobId) {\r\n        require(msg.sender == jobs[jobId].client, \"Only client can call this function\");\r\n        _;\r\n    }\r\n\r\n    modifier onlyFreelancer(uint256 jobId) {\r\n        require(msg.sender == jobs[jobId].freelancer, \"Only freelancer can call this function\");\r\n        _;\r\n    }\r\n\r\n    modifier validJob(uint256 jobId) {\r\n        require(jobs[jobId].client != address(0), \"Job does not exist\");\r\n        _;\r\n    }\r\n\r\n    constructor() {\r\n        owner = msg.sender;\r\n    }\r\n\r\n    function createJob(address freelancer) external payable {\r\n        require(msg.value > 0, \"Payment must be greater than zero\");\r\n        require(freelancer != address(0), \"Invalid freelancer address\");\r\n        \r\n        jobCounter++;\r\n        jobs[jobCounter] = Job(msg.sender, freelancer, msg.value, JobStatus.Pending);\r\n    }\r\n\r\n    function acceptJob(uint256 jobId) external onlyFreelancer(jobId) validJob(jobId) {\r\n        require(jobs[jobId].status == JobStatus.Pending, \"Job is not pending\");\r\n        jobs[jobId].status = JobStatus.Accepted;\r\n    }\r\n\r\n    function completeJob(uint256 jobId) external onlyClient(jobId) validJob(jobId) {\r\n        require(jobs[jobId].status == JobStatus.Accepted, \"Job is not accepted yet\");\r\n        jobs[jobId].status = JobStatus.Completed;\r\n    }\r\n\r\n    function withdrawPayment(uint256 jobId) external onlyFreelancer(jobId) validJob(jobId) {\r\n        require(jobs[jobId].status == JobStatus.Completed, \"Job is not completed yet\");\r\n        \r\n        uint256 amount = jobs[jobId].amount;\r\n        jobs[jobId].status = JobStatus.Withdrawn;\r\n        payable(msg.sender).transfer(amount);\r\n    }\r\n}"
+    }
+  },
+  "settings": {
+    "evmVersion": "paris",
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}
